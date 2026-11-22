@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seva’s ParkWay — Aqlli Avtoturargoh Tizimi</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            navy: {
+              950: '#070D1F',
+              900: '#0B132B',
+              800: '#1C2541',
+              700: '#273459',
+            },
+            brand: {
+              blue: '#3B82F6',
+              cyan: '#38BDF8',
+              green: '#22C55E',
+              red: '#EF4444',
+              amber: '#F59E0B',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Asosiy fon va animatsiyalar (Taqdimot PDF 1, 2, 7-sahifalar asosida) */
+    body {
+      background-color: #070D1F;
+      color: #F8FAFC;
+      overflow-x: hidden;
+    }
+
+    /* Harakatlanuvchi mashinalar va parkovka foni animatsiyasi */
+    .bg-grid-pattern {
+      background-image: 
+        linear-gradient(to right, rgba(59, 130, 246, 0.07) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(59, 130, 246, 0.07) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+
+    @keyframes driveRight {
+      0% { transform: translateX(-140px); opacity: 0; }
+      10% { opacity: 0.55; }
+      90% { opacity: 0.55; }
+      100% { transform: translateX(calc(100vw + 140px)); opacity: 0; }
+    }
+
+    @keyframes driveLeft {
+      0% { transform: translateX(calc(100vw + 140px)) scaleX(-1); opacity: 0; }
+      10% { opacity: 0.45; }
+      90% { opacity: 0.45; }
+      100% { transform: translateX(-140px) scaleX(-1); opacity: 0; }
+    }
+
+    @keyframes scanBeam {
+      0%, 100% { opacity: 0.25; transform: skewX(-12deg) scaleY(0.96); }
+      50% { opacity: 0.65; transform: skewX(-8deg) scaleY(1.03); }
+    }
+
+    @keyframes barrierArm {
+      0%, 40% { transform: rotate(0deg); }
+      55%, 85% { transform: rotate(-58deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    @keyframes pulseRadar {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.5); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(56, 189, 248, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+    }
+
+    .car-bg-1 {
+      animation: driveRight 18s linear infinite;
+    }
+    .car-bg-2 {
+      animation: driveLeft 24s linear infinite;
+      animation-delay: 5s;
+    }
+    .car-bg-3 {
+      animation: driveRight 28s linear infinite;
+      animation-delay: 11s;
+    }
+    .scan-beam-anim {
+      transform-origin: top left;
+      animation: scanBeam 3.5s ease-in-out infinite;
+    }
+    .barrier-arm-anim {
+      transform-origin: 94% 50%;
+      animation: barrierArm 7s ease-in-out infinite;
+    }
+    .radar-dot {
+      animation: pulseRadar 2s infinite;
+    }
+
+    /* Chiroyli scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0B132B; }
+    ::-webkit-scrollbar-thumb { background: #273459; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+  </style>
+</head>
+<body class="bg-grid-pattern min-h-screen flex flex-col justify-between relative selection:bg-blue-500 selection:text-white">
+
+  <!-- FON ANIMATSIYASI: Harakatlanuvchi mashinalar va parkovka chiziqlari (GIF effekti) -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <!-- Yuqori nur effekti -->
+    <div class="absolute -top-32 left-1/4 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+
+    <!-- Yo'l chiziqlari va harakatlanuvchi SVG mashinalar -->
+    <div class="absolute bottom-14 inset-x-0 border-t border-dashed border-blue-500/15"></div>
+    <div class="car-bg-1 absolute bottom-16 left-0">
+      <svg width="92" height="34" viewBox="0 0 92 34" fill="none">
+        <rect x="8" y="12" width="76" height="14" rx="5" fill="#1E3A8A" stroke="#38BDF8" stroke-width="1.5"/>
+        <path d="M22 12L31 4H60L70 12H22Z" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5"/>
+        <circle cx="24" cy="27" r="5" fill="#0B132B" stroke="#93C5FD" stroke-width="2"/>
+        <circle cx="68" cy="27" r="5" fill="#0B132B" stroke="#93C5FD" stroke-width="2"/>
+        <rect x="80" y="15" width="5" height="4" rx="1" fill="#FDE047"/>
+      </svg>
+    </div>
+
+    <div class="absolute top-28 inset-x-0 border-t border-dashed border-slate-700/20"></div>
+    <div class="car-bg-2 absolute top-20 left-0">
+      <svg width="86" height="32" viewBox="0 0 92 34" fill="none">
+        <rect x="8" y="12" width="76" height="14" rx="5" fill="#064E3B" stroke="#34D399" stroke-width="1.5"/>
+        <path d="M22 12L31 4H60L70 12H22Z" fill="#0F172A" stroke="#34D399" stroke-width="1.5"/>
+        <circle cx="24" cy="27" r="5" fill="#0B132B" stroke="#6EE7B7" stroke-width="2"/>
+        <circle cx="68" cy="27" r="5" fill="#0B132B" stroke="#6EE7B7" stroke-width="2"/>
+        <rect x="80" y="15" width="5" height="4" rx="1" fill="#38BDF8"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- YUQORI NAVIGATSIYA PANELI (IXCHAM VA TELEFONGA MOS) -->
+  <header class="sticky top-0 z-40 bg-navy-900/90 backdrop-blur-md border-b border-blue-500/20">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <!-- Brend va AI badge -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/25 shrink-0">
+          <span class="font-extrabold text-navy-950 text-lg tracking-tighter">P</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-white leading-none">
+              Seva’s <span class="text-blue-400">ParkWay</span>
+            </h1>
+            <span class="hidden sm:inline-block text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-blue-500/15 text-cyan-300 border border-blue-400/30">
+              AI • IoT
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-tight mt-0.5">Aqlli avtoturargoh boshqaruv tizimi</p>
+        </div>
+      </div>
+
+      <!-- Mijoz Paneli / Admin Paneli almashtirgich -->
+      <div class="flex items-center bg-navy-950/90 p-1 rounded-xl border border-slate-700/70 shadow-inner">
+        <button id="btn-tab-client" onclick="switchPanel('client')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-blue-600 text-white shadow-md shadow-blue-600/30">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8m-8 4h8m-4 4h4M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
+          <span>Mijoz Paneli</span>
+        </button>
+        <button id="btn-tab-admin" onclick="switchPanel('admin')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>Admin Paneli</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ASOSIY KONTENT -->
+  <main class="relative z-10 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 space-y-4 flex-1">
+
+    <!-- HERO BANNER: PDF 1-SAHIFADAGI AI KAMERA + SHLAGBAUM + AVTO TURARGOH ILLYUSTRATSIYASI -->
+    <section class="rounded-2xl bg-gradient-to-r from-navy-900 via-navy-800/95 to-navy-900 border border-blue-500/25 p-3.5 sm:p-5 shadow-xl overflow-hidden relative">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+        <!-- Chap taraf: Matn va Tezkor ko'rsatkichlar -->
+        <div class="lg:col-span-7 space-y-2.5">
+          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-400/30 text-cyan-300 text-[11px] font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 radar-dot"></span>
+            AI KOMPYUTER KO‘RISHI • IoT SENSORLAR • ALPR OCR
+          </div>
+          <h2 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight leading-snug">
+            Sun’iy intellekt asosida avtomatlashtirilgan <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">aqlli avtoturargoh</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+            Davlat raqamini AI yordamida soniyalar ichida tanib olish, 1–5 qavatlardagi bo‘sh joylarni real vaqtda kuzatish va qulay obuna paketlari orqali navbatsiz kirish.
+          </p>
+
+          <!-- Jonli holat pillari -->
+          <div class="flex flex-wrap items-center gap-2 pt-1">
+            <div class="flex items-center gap-1.5 bg-navy-950/80 px-2.5 py-1.5 rounded-xl border border-emerald-500/30 text-xs">
+              <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span>
+              <span class="text-slate-300">Bo‘sh joylar:</span>
+              <strong id="hero-free-count" class="text-emerald-400 font-mono">0</strong>
+            </div>
+            <div class="flex items-center gap-1.5 bg-navy-950/80 px-2.5 py-1.5 rounded-xl border border-red-500/30 text-xs">
+              <span class="w-2.5 h-2.5 rounded-sm bg-red-500"></span>
+              <span class="text-slate-300">Band:</span>
+              <strong id="hero-occupied-count" class="text-red-400 font-mono">0</strong>
+            </div>
+            <div class="flex items-center gap-1.5 bg-navy-950/80 px-2.5 py-1.5 rounded-xl border border-blue-500/30 text-xs">
+              <span class="w-2.5 h-2.5 rounded-sm bg-blue-500"></span>
+              <span class="text-slate-300">Bron qilingan:</span>
+              <strong id="hero-reserved-count" class="text-blue-400 font-mono">0</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- O'ng taraf: PDF 1-sahifadagi AI Kamera + Mashina + Shlagbaum jonli SVG simulyatsiyasi -->
+        <div class="lg:col-span-5">
+          <div class="rounded-xl bg-navy-950/90 border border-blue-500/30 p-3 relative overflow-hidden">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
+              <span class="flex items-center gap-1.5 font-medium text-cyan-300">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+                Avto turargoh • jonli AI nazorat
+              </span>
+              <span id="live-ocr-badge" class="font-mono text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                OCR: 01 A 123 BC
+              </span>
+            </div>
+
+            <!-- Jonli SVG Illyustratsiya (Taqdimot 1-bet nusxasi) -->
+            <svg viewBox="0 0 380 145" class="w-full h-32 sm:h-36 rounded-lg bg-gradient-to-b from-[#081026] to-[#0E1B3D]">
+              <!-- Kamera ustuni va boshi -->
+              <rect x="28" y="42" width="5" height="90" fill="#1E3A8A"/>
+              <rect x="14" y="24" width="44" height="22" rx="5" fill="#0F172A" stroke="#38BDF8" stroke-width="1.8"/>
+              <circle cx="22" cy="31" r="2" fill="#22C55E"/>
+              <circle cx="50" cy="35" r="6" fill="#0B132B" stroke="#38BDF8" stroke-width="2"/>
+              <circle cx="50" cy="35" r="2.5" fill="#38BDF8"/>
+
+              <!-- Kamera lazer nuri -->
+              <polygon points="56,36 135,112 185,112" fill="url(#beamGrad)" class="scan-beam-anim"/>
+              <defs>
+                <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.45"/>
+                  <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+
+              <!-- O'ng yuqoridagi mini monitor (PDF 1-betdagi kabi) -->
+              <g transform="translate(195, 10)">
+                <rect x="0" y="0" width="172" height="66" rx="7" fill="#0B132B" stroke="#2563EB" stroke-width="1.2"/>
+                <circle cx="10" cy="9" r="2" fill="#EF4444"/>
+                <circle cx="17" cy="9" r="2" fill="#F59E0B"/>
+                <circle cx="24" cy="9" r="2" fill="#22C55E"/>
+                <!-- Mini kataklar -->
+                <rect x="10" y="18" width="14" height="12" rx="2" fill="#22C55E"/>
+                <rect x="28" y="18" width="14" height="12" rx="2" fill="#EF4444"/>
+                <rect x="46" y="18" width="14" height="12" rx="2" fill="#EF4444"/>
+                <rect x="64" y="18" width="14" height="12" rx="2" fill="#22C55E"/>
+                <rect x="82" y="18" width="14" height="12" rx="2" fill="#3B82F6"/>
+                <rect x="100" y="18" width="14" height="12" rx="2" fill="#22C55E"/>
+
+                <rect x="10" y="34" width="14" height="12" rx="2" fill="#EF4444"/>
+                <rect x="28" y="34" width="14" height="12" rx="2" fill="#22C55E"/>
+                <rect x="46" y="34" width="14" height="12" rx="2" fill="#22C55E"/>
+                <rect x="64" y="34" width="14" height="12" rx="2" fill="#EF4444"/>
+                <rect x="82" y="34" width="14" height="12" rx="2" fill="#22C55E"/>
+                <rect x="100" y="34" width="14" height="12" rx="2" fill="#3B82F6"/>
+
+                <!-- Mini grafik -->
+                <polyline points="10,58 35,52 60,55 90,48 120,51 155,42" fill="none" stroke="#38BDF8" stroke-width="1.8"/>
+                <circle cx="145" cy="28" r="11" fill="none" stroke="#22C55E" stroke-width="4" stroke-dasharray="45 25"/>
+              </g>
+
+              <!-- Mashina old ko'rinishi -->
+              <g transform="translate(115, 76)">
+                <ellipse cx="45" cy="54" rx="48" ry="5" fill="#040814"/>
+                <path d="M16 20 L24 4 L66 4 L74 20 Z" fill="#172554" stroke="#60A5FA" stroke-width="1.6"/>
+                <rect x="8" y="20" width="74" height="26" rx="7" fill="#1E3A8A" stroke="#60A5FA" stroke-width="1.8"/>
+                <!-- Faralar -->
+                <rect x="14" y="26" width="12" height="5" rx="2.5" fill="#E0F2FE"/>
+                <rect x="64" y="26" width="12" height="5" rx="2.5" fill="#E0F2FE"/>
+                <!-- Davlat raqami ramkasi -->
+                <rect x="33" y="34" width="24" height="8" rx="1.5" fill="#F8FAFC" stroke="#38BDF8" stroke-width="1.5"/>
+                <!-- G'ildiraklar -->
+                <rect x="14" y="46" width="10" height="7" rx="2" fill="#020617"/>
+                <rect x="66" y="46" width="10" height="7" rx="2" fill="#020617"/>
+              </g>
+
+              <!-- Shlagbaum ustuni va harakatlanuvchi tayog'i -->
+              <g class="barrier-arm-anim">
+                <rect x="75" y="96" width="250" height="7" rx="3" fill="#F8FAFC"/>
+                <rect x="95" y="96" width="22" height="7" fill="#2563EB"/>
+                <rect x="139" y="96" width="22" height="7" fill="#2563EB"/>
+                <rect x="183" y="96" width="22" height="7" fill="#2563EB"/>
+                <rect x="227" y="96" width="22" height="7" fill="#2563EB"/>
+                <rect x="271" y="96" width="22" height="7" fill="#2563EB"/>
+                <circle cx="79" cy="99.5" r="2" fill="#EF4444"/>
+              </g>
+              <rect x="320" y="84" width="28" height="48" rx="5" fill="#172554" stroke="#3B82F6" stroke-width="1.6"/>
+              <circle cx="334" cy="93" r="3" fill="#22C55E"/>
+              <circle cx="329" cy="108" r="4" fill="#0B132B" stroke="#60A5FA" stroke-width="1.2"/>
+              <circle cx="339" cy="108" r="4" fill="#0B132B" stroke="#60A5FA" stroke-width="1.2"/>
+
+              <!-- Yer chizig'i -->
+              <line x1="0" y1="132" x2="380" y2="132" stroke="#1E3A8A" stroke-width="2"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 1. MIJOZ PANELI (CLIENT PANEL)                                        -->
+    <!-- ===================================================================== -->
+    <div id="panel-client" class="space-y-5">
+
+      <!-- VILOYAT TANLASH VA NARXLAR KESIMI -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Viloyat tanlovi va soatlik tarif -->
+        <div class="lg:col-span-7 rounded-2xl bg-navy-900/90 border border-slate-700/80 p-4 shadow-lg flex flex-col justify-between gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="text-[11px] font-mono uppercase text-blue-400 font-semibold">01 • Hududiy tarif va lokatsiya</span>
+              <h3 class="text-base sm:text-lg font-bold text-white">Viloyatni tanlang (narxlar hududlar kesimida)</h3>
+            </div>
+            <div class="px-3 py-1.5 rounded-xl bg-blue-500/15 border border-blue-400/30 text-right">
+              <div class="text-[10px] text-slate-300">Soatlik narx</div>
+              <div id="selected-region-price" class="text-sm sm:text-base font-extrabold text-cyan-300 font-mono">10,000 so‘m/soat</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="region-select" class="block text-xs text-slate-400 mb-1">O‘zbekiston hududi / viloyati:</label>
+              <select id="region-select" onchange="handleRegionChange()" class="w-full rounded-xl bg-navy-950 border border-blue-500/40 px-3 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-cyan-400">
+                <!-- JS orqali 14 ta viloyat to'ldiriladi -->
+              </select>
+            </div>
+            <div class="rounded-xl bg-navy-950/80 border border-slate-800 p-2.5 flex items-center justify-between">
+              <div>
+                <div class="text-[11px] text-slate-400">Tanlangan markaz:</div>
+                <div id="region-hub-name" class="text-xs sm:text-sm font-semibold text-white">Toshkent — Magic City & Amir Temur Hub</div>
+                <div id="region-discount-note" class="text-[11px] text-emerald-400 mt-0.5">Obuna bilan 100% bepul kirish</div>
+              </div>
+              <div class="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-xs">
+                5 Qavat
+              </div>
+            </div>
+          </div>
+
+          <!-- Barcha viloyatlar narx jadvali (ixcham gorizontal scroll) -->
+          <div>
+            <div class="text-[11px] text-slate-400 mb-1.5">Viloyatlar kesimidagi tezkor narxlar (bosib tanlang):</div>
+            <div id="region-pills-container" class="flex gap-1.5 overflow-x-auto pb-1.5">
+              <!-- JS orqali chiqariladi -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Mijozning Raqamli Avto Turargoh Passi (PDF 6-sahifa uslubida) -->
+        <div class="lg:col-span-5 rounded-2xl bg-gradient-to-br from-navy-800 to-navy-950 border border-cyan-500/30 p-4 shadow-lg flex flex-col justify-between">
+          <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
+            <div>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-cyan-400">RAQAMLI AVTO TURARGOH PASSI</span>
+              <h3 class="text-sm sm:text-base font-bold text-white">Mijoz profili va balans</h3>
+            </div>
+            <span id="pass-status-badge" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+              Obuna: Faol
+            </span>
+          </div>
+
+          <div class="my-3 grid grid-cols-2 gap-2.5">
+            <div class="rounded-xl bg-navy-950/90 border border-slate-700/80 p-2.5">
+              <div class="text-[11px] text-slate-400">Davlat raqami</div>
+              <div id="client-plate-display" class="mt-1 inline-block px-2 py-0.5 rounded bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm tracking-wider border-2 border-slate-400">
+                01 A 123 BC
+              </div>
+            </div>
+            <div class="rounded-xl bg-navy-950/90 border border-slate-700/80 p-2.5">
+              <div class="text-[11px] text-slate-400">Faol obuna va soat</div>
+              <div id="client-sub-display" class="text-sm sm:text-base font-extrabold text-amber-400 mt-0.5">
+                PLUS • 100 soat
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-xs bg-blue-500/10 border border-blue-500/20 rounded-xl px-3 py-2">
+            <span class="text-slate-300">Oxirgi bron: <strong id="last-booking-info" class="text-white">Hali bron qilinmagan</strong></span>
+            <button onclick="scrollToSubscriptions()" class="text-cyan-300 hover:text-cyan-200 font-semibold underline shrink-0 ml-2">
+              Obunani yangilash
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1 DAN 5 GACHA QAVATLAR VA BRON QILISH INTERAKTIV XARITASI -->
+      <section class="rounded-2xl bg-navy-900/95 border border-slate-700/80 p-3.5 sm:p-5 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+          <div>
+            <span class="text-[11px] font-mono uppercase text-emerald-400 font-semibold">02 • Aqlli joylarni nazorat qilish (1–5 qavatlar)</span>
+            <h3 class="text-base sm:text-xl font-bold text-white">Qavatni tanlang va bo‘sh joyni bron qiling</h3>
+          </div>
+
+          <!-- 1 dan max 5 gacha qavat tugmalari -->
+          <div id="floor-tabs" class="flex flex-wrap gap-1.5">
+            <!-- JS orqali 1-5 qavatlar chiqariladi -->
+          </div>
+        </div>
+
+        <!-- Tanlangan qavat statistikasi va belgilar izohi -->
+        <div class="flex flex-wrap items-center justify-between gap-2 my-3 bg-navy-950/75 px-3 py-2 rounded-xl border border-slate-800 text-xs">
+          <div class="flex items-center gap-3 sm:gap-4">
+            <span class="flex items-center gap-1.5 text-slate-200">
+              <span class="w-3.5 h-3.5 rounded bg-emerald-500 inline-block shadow shadow-emerald-500/40"></span>
+              Bo‘sh (<strong id="floor-free-count" class="text-emerald-400 font-mono">0</strong>)
+            </span>
+            <span class="flex items-center gap-1.5 text-slate-200">
+              <span class="w-3.5 h-3.5 rounded bg-red-500 inline-block shadow shadow-red-500/40"></span>
+              Band (<strong id="floor-occupied-count" class="text-red-400 font-mono">0</strong>)
+            </span>
+            <span class="flex items-center gap-1.5 text-slate-200">
+              <span class="w-3.5 h-3.5 rounded bg-blue-500 inline-block shadow shadow-blue-500/40"></span>
+              Bron qilingan (<strong id="floor-reserved-count" class="text-blue-400 font-mono">0</strong>)
+            </span>
+          </div>
+          <div class="text-[11px] text-cyan-300 font-medium">
+            * Yashil katak ustiga bosib darhol bron qiling
+          </div>
+        </div>
+
+        <!-- Sensorli avtoturargoh joylari xaritasi (PDF 7-sahifa uslubida) -->
+        <div class="rounded-xl bg-navy-950 border border-blue-500/20 p-3 sm:p-4">
+          <!-- Yuqori qator joylar -->
+          <div id="parking-grid-top" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 sm:gap-2.5"></div>
+
+          <!-- O'rtadagi harakatlanish yo'lagi (Kirishdagi sensor va yo'l chizig'i) -->
+          <div class="my-3.5 py-2.5 px-3 rounded-lg bg-navy-900/90 border-y border-dashed border-blue-500/40 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-[10px] sm:text-xs font-mono font-bold">
+                KIRISH SENSORI →
+              </span>
+              <span id="current-floor-label" class="text-xs sm:text-sm font-bold text-white">1-qavat • A/B sektor</span>
+            </div>
+            <span class="text-[11px] text-slate-400 hidden sm:inline">Har bir joyda ultrasonic + IR sensor o‘rnatilgan</span>
+          </div>
+
+          <!-- Pastki qator joylar -->
+          <div id="parking-grid-bottom" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 sm:gap-2.5"></div>
+        </div>
+      </section>
+
+      <!-- OBUNA TARIFLARI: 100 SOAT PLUS, 200 SOAT PRO, 300 SOAT VIP (QAYERDA BO'SH JOY BORLIGINI KO'RSATISH) -->
+      <section id="subscriptions-section" class="space-y-3">
+        <div class="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <span class="text-[11px] font-mono uppercase text-amber-400 font-semibold">03 • Doimiy mijozlar uchun obuna paketlari</span>
+            <h3 class="text-base sm:text-xl font-bold text-white">Qulay obuna tarifini tanlang</h3>
+          </div>
+          <p class="text-xs text-slate-400">Obuna sotib olinganda soatlar balansingizga avtomatik qo‘shiladi</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- 1. 100 SOAT PLUS OBUNA -->
+          <div class="rounded-2xl bg-navy-900/95 border border-blue-500/35 p-4 sm:p-5 flex flex-col justify-between shadow-lg hover:border-blue-400 transition-all">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-xs font-bold tracking-wide">PLUS OBUNA</span>
+                <span class="text-xs font-mono text-slate-400">100 soatlik paket</span>
+              </div>
+              <div class="mt-3 flex items-baseline gap-1.5">
+                <span class="text-2xl sm:text-3xl font-extrabold text-white font-mono">100 soat</span>
+                <span class="text-xs text-slate-400">/ oyiga</span>
+              </div>
+              <div class="mt-1 text-lg font-bold text-cyan-300 font-mono">450,000 so‘m</div>
+              <ul class="mt-3.5 space-y-2 text-xs sm:text-sm text-slate-300">
+                <li class="flex items-center gap-2">
+                  <span class="text-emerald-400 font-bold">✓</span> 100 soatlik avtoturargoh limiti
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="text-emerald-400 font-bold">✓</span> Davlat raqami orqali shlagbaumdan tez kirish
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="text-emerald-400 font-bold">✓</span> 1–5 qavatlarda oldindan joy bron qilish
+                </li>
+              </ul>
+            </div>
+            <button onclick="buySubscription('PLUS 100 soat', 100, 450000)" class="mt-5 w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-[0.99] text-white font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-blue-600/25">
+              100 soat PLUS sotib olish
+            </button>
+          </div>
+
+          <!-- 2. 200 SOAT PRO OBUNA -->
+          <div class="rounded-2xl bg-gradient-to-b from-navy-800 to-navy-900 border-2 border-cyan-400/60 p-4 sm:p-5 flex flex-col justify-between shadow-xl relative">
+            <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-navy-950 font-extrabold text-[10px] uppercase tracking-wider">
+              Ommabop tanlov
+            </div>
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs font-bold tracking-wide">PRO OBUNA</span>
+                <span class="text-xs font-mono text-slate-300">200 soatlik paket</span>
+              </div>
+              <div class="mt-3 flex items-baseline gap-1.5">
+                <span class="text-2xl sm:text-3xl font-extrabold text-white font-mono">200 soat</span>
+                <span class="text-xs text-slate-300">/ oyiga</span>
+              </div>
+              <div class="mt-1 text-lg font-bold text-emerald-400 font-mono">800,000 so‘m</div>
+              <ul class="mt-3.5 space-y-2 text-xs sm:text-sm text-slate-200">
+                <li class="flex items-center gap-2">
+                  <span class="text-emerald-400 font-bold">✓</span> 200 soatlik kengaytirilgan balans
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="text-emerald-400 font-bold">✓</span> Barcha 14 viloyat parkovkalarida amal qiladi
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="text-emerald-400 font-bold">✓</span> Navbatsiz AI Fast-Pass va SMS xabarnoma
+                </li>
+              </ul>
+            </div>
+            <button onclick="buySubscription('PRO 200 soat', 200, 800000)" class="mt-5 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 active:scale-[0.99] text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-cyan-500/25">
+              200 soat PRO sotib olish
+            </button>
+          </div>
+
+          <!-- 3. 300 SOAT VIP / MAX OBUNA (QAYERDA BO'SH JOY BORLIGINI KO'RSATISH BILAN) -->
+          <div class="rounded-2xl bg-gradient-to-b from-[#1A1F3C] to-navy-950 border-2 border-amber-400/60 p-4 sm:p-5 flex flex-col justify-between shadow-xl relative">
+            <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-amber-400 text-navy-950 font-extrabold text-[10px] uppercase tracking-wider">
+              300h + Jonli Radar
+            </div>
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-xs font-bold tracking-wide">VIP MAX 300</span>
+                <span class="text-xs font-mono text-amber-300">300 soat + Lokator</span>
+              </div>
+              <div class="mt-3 flex items-baseline gap-1.5">
+                <span class="text-2xl sm:text-3xl font-extrabold text-white font-mono">300 soat</span>
+                <span class="text-xs text-slate-300">+ AI Joy Topuvchi</span>
+              </div>
+              <div class="mt-1 text-lg font-bold text-amber-400 font-mono">1,100,000 so‘m</div>
+
+              <!-- 300 OBUNA MAXSUS FUNKSIYASI: QAYERDA BO'SH JOY BORLIGINI KO'RSATISH -->
+              <div class="mt-3 rounded-xl bg-navy-950/90 border border-amber-400/35 p-2.5">
+                <div class="flex items-center justify-between text-[11px] font-bold text-amber-300 mb-1.5">
+                  <span class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    Qayerda bo‘sh joy bor (Jonli):
+                  </span>
+                  <span class="text-[10px] font-mono text-emerald-400">1–5 qavat</span>
+                </div>
+                <div id="vip-300-live-spots" class="space-y-1 max-h-28 overflow-y-auto pr-1 text-[11px]">
+                  <!-- JS orqali har bir qavatdagi aniq bo'sh joy raqamlari ko'rsatiladi -->
+                </div>
+              </div>
+            </div>
+            <button onclick="buySubscription('VIP MAX 300 soat', 300, 1100000)" class="mt-4 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 active:scale-[0.99] text-navy-950 font-extrabold text-xs sm:text-sm transition-all shadow-lg shadow-amber-500/25">
+              300 soat VIP sotib olish
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 2. ADMIN PANELI (ADMIN PANEL — BRON QILISH FUNKSIYASI YO'Q!)          -->
+    <!-- ===================================================================== -->
+    <div id="panel-admin" class="hidden space-y-5">
+
+      <!-- Admin ogohlantirish / Rejim belgisi -->
+      <div class="rounded-2xl bg-navy-900/95 border border-amber-500/30 p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white">Administrator Nazorat va Tushumlar Paneli</h3>
+            <p class="text-xs text-slate-400">Faqat monitoring va moliyaviy tahlil rejimi (Admin panelda joy bron qilish o‘chirilgan)</p>
+          </div>
+        </div>
+        <span class="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono">
+          ● Tizim onlayn • 14 Viloyat ulangan
+        </span>
+      </div>
+
+      <!-- MIJOZLARDAN KELAYOTGAN TUSHUMLAR KPI KARTALARI -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="rounded-2xl bg-gradient-to-br from-navy-800 to-navy-900 border border-emerald-500/35 p-4 shadow-lg">
+          <div class="text-xs text-slate-400">Umumiy tushum (Jami)</div>
+          <div id="admin-total-revenue" class="text-xl sm:text-2xl font-extrabold text-emerald-400 font-mono mt-1">18,450,000 so‘m</div>
+          <div class="text-[11px] text-emerald-300/80 mt-1.5 flex items-center gap-1">
+            <span>↑ +14.8%</span> <span class="text-slate-400">o‘tgan haftaga nisbatan</span>
+          </div>
+        </div>
+
+        <div class="rounded-2xl bg-navy-900/95 border border-blue-500/35 p-4 shadow-lg">
+          <div class="text-xs text-slate-400">Bugungi tushum</div>
+          <div id="admin-today-revenue" class="text-xl sm:text-2xl font-extrabold text-cyan-300 font-mono mt-1">2,890,000 so‘m</div>
+          <div class="text-[11px] text-slate-400 mt-1.5">
+            Tranzaksiyalar soni: <strong id="admin-tx-count" class="text-white font-mono">0</strong> ta
+          </div>
+        </div>
+
+        <div class="rounded-2xl bg-navy-900/95 border border-amber-500/35 p-4 shadow-lg">
+          <div class="text-xs text-slate-400">Obunalardan tushum (100/200/300h)</div>
+          <div id="admin-sub-revenue" class="text-xl sm:text-2xl font-extrabold text-amber-400 font-mono mt-1">14,200,000 so‘m</div>
+          <div class="text-[11px] text-slate-400 mt-1.5">
+            Faol obunachilar: <strong id="admin-sub-count" class="text-white font-mono">48</strong> nafar
+          </div>
+        </div>
+
+        <div class="rounded-2xl bg-navy-900/95 border border-purple-500/35 p-4 shadow-lg">
+          <div class="text-xs text-slate-400">Soatlik bronlardan tushum</div>
+          <div id="admin-booking-revenue" class="text-xl sm:text-2xl font-extrabold text-purple-300 font-mono mt-1">4,250,000 so‘m</div>
+          <div class="text-[11px] text-slate-400 mt-1.5">
+            O‘rtacha chek: <strong class="text-white font-mono">18,500 so‘m</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- VILOYATLAR BO'YICHA TUSHUM GRAFIGI VA QAVATLAR BANDLIGI (FAQAT KO'RISH) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Viloyatlar kesimida tushum ulushi -->
+        <div class="lg:col-span-6 rounded-2xl bg-navy-900/95 border border-slate-700/80 p-4 shadow-lg">
+          <h4 class="text-sm sm:text-base font-bold text-white mb-1">Viloyatlar kesimida tushum tahlili</h4>
+          <p class="text-xs text-slate-400 mb-3">Eng yuqori daromad keltirayotgan hududlar</p>
+          <div id="admin-region-bars" class="space-y-2.5">
+            <!-- JS orqali progress barlar chiziladi -->
+          </div>
+        </div>
+
+        <!-- 1–5 qavatlar bandlik holati (Faqat monitoring, bron qilish tugmasi yo'q) -->
+        <div class="lg:col-span-6 rounded-2xl bg-navy-900/95 border border-slate-700/80 p-4 shadow-lg">
+          <div class="flex items-center justify-between mb-1">
+            <h4 class="text-sm sm:text-base font-bold text-white">1–5 qavatlar real-vaqt bandligi</h4>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Faqat kuzatuv</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-3">Sensorlardan kelayotgan umumiy statistika</p>
+          <div id="admin-floors-summary" class="space-y-2.5">
+            <!-- JS orqali 1-5 qavatlar ko'rsatiladi -->
+          </div>
+        </div>
+      </section>
+
+      <!-- MIJOZLAR TO'LOVLARI VA TUSHUMLAR JADVALI -->
+      <section class="rounded-2xl bg-navy-900/95 border border-slate-700/80 p-4 shadow-lg">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div>
+            <h4 class="text-sm sm:text-base font-bold text-white">Mijozlardan kelayotgan oxirgi tushumlar</h4>
+            <p class="text-xs text-slate-400">Mijoz panelida qilingan har bir bron va obuna xaridi bu yerda jonli aks etadi</p>
+          </div>
+          <span class="text-xs font-mono text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-2.5 py-1 rounded-lg">
+            Jonli moliya jurnali
+          </span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="border-b border-slate-700 text-slate-400 text-[11px] uppercase">
+                <th class="py-2.5 px-3">Vaqt</th>
+                <th class="py-2.5 px-3">Davlat raqami</th>
+                <th class="py-2.5 px-3">Viloyat</th>
+                <th class="py-2.5 px-3">Xizmat turi</th>
+                <th class="py-2.5 px-3 text-right">Tushum summasi</th>
+              </tr>
+            </thead>
+            <tbody id="admin-transactions-table" class="divide-y divide-slate-800/80">
+              <!-- JS orqali tranzaksiyalar ro'yxati chiqariladi -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- BRON QILISH MODALI (FAQAT MIJOZ PANELI UCHUN)                         -->
+  <!-- ===================================================================== -->
+  <div id="booking-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-3">
+    <div class="w-full max-w-md rounded-2xl bg-navy-900 border border-blue-500/40 p-4 sm:p-5 shadow-2xl space-y-3.5">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+        <div>
+          <span class="text-[10px] font-mono uppercase text-cyan-400">AI ALPR • Joyni bron qilish</span>
+          <h4 id="modal-slot-title" class="text-base sm:text-lg font-bold text-white">1-qavat • Joy #A1</h4>
+        </div>
+        <button onclick="closeBookingModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs sm:text-sm">
+        <div>
+          <label class="block text-slate-300 mb-1">Avtomobil davlat raqami (AI kamera uchun):</label>
+          <input id="modal-plate-input" type="text" value="01 A 123 BC" maxlength="12" placeholder="Masalan: 01 A 777 AA" class="w-full rounded-xl bg-navy-950 border border-blue-500/40 px-3 py-2 text-white font-mono uppercase font-bold tracking-wider focus:outline-none focus:border-cyan-400" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-slate-300 mb-1">Davomiyligi (soat):</label>
+            <select id="modal-hours-select" onchange="updateBookingPricePreview()" class="w-full rounded-xl bg-navy-950 border border-slate-700 px-3 py-2 text-white font-semibold focus:outline-none focus:border-cyan-400">
+              <option value="1">1 soat</option>
+              <option value="2" selected>2 soat</option>
+              <option value="3">3 soat</option>
+              <option value="5">5 soat</option>
+              <option value="12">12 soat</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1">To‘lov turi:</label>
+            <select id="modal-payment-type" onchange="updateBookingPricePreview()" class="w-full rounded-xl bg-navy-950 border border-slate-700 px-3 py-2 text-white font-semibold focus:outline-none focus:border-cyan-400">
+              <option value="balance">Obuna soatidan yechish</option>
+              <option value="cash">Naqd / Karta orqali to‘lash</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="rounded-xl bg-navy-950/90 border border-slate-800 p-3 space-y-1">
+          <div class="flex justify-between text-xs text-slate-400">
+            <span>Viloyat tarifi:</span>
+            <span id="modal-region-rate" class="text-slate-200 font-mono">10,000 so‘m/soat</span>
+          </div>
+          <div class="flex justify-between text-xs text-slate-400">
+            <span>Obuna balansingiz:</span>
+            <span id="modal-sub-balance" class="text-amber-400 font-mono">100 soat</span>
+          </div>
+          <div class="flex justify-between text-sm font-bold text-white pt-1.5 border-t border-slate-800">
+            <span>Jami to‘lov:</span>
+            <span id="modal-total-cost" class="text-emerald-400 font-mono">0 so‘m (Obuna hisobidan)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-1">
+        <button onclick="closeBookingModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs sm:text-sm">
+          Bekor qilish
+        </button>
+        <button onclick="confirmBooking()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-600/30">
+          Bronni tasdiqlash
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BILDIRISHNOMA TOAST (alert() o'rniga) -->
+  <div id="toast-box" class="fixed bottom-4 right-4 z-50 max-w-sm transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="rounded-xl bg-navy-800 border border-cyan-400/50 px-4 py-3 shadow-2xl flex items-start gap-2.5">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 mt-1.5 shrink-0"></span>
+      <div>
+        <div id="toast-title" class="text-xs sm:text-sm font-bold text-white">Muvaffaqiyatli!</div>
+        <div id="toast-msg" class="text-[11px] sm:text-xs text-slate-300 mt-0.5">Amaliyot bajarildi.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER (Taqdimot 11-sahifadagi mualliflik ma'lumoti bilan) -->
+  <footer class="relative z-10 border-t border-slate-800/90 bg-navy-950/90 mt-8">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] sm:text-xs text-slate-400">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-white">Seva’s ParkWay</span>
+        <span>•</span>
+        <span>Aqlli boshqaruv, qulay avtoturargoh, samarali shahar</span>
+      </div>
+      <div>
+        Muallif: <span class="text-slate-200 font-medium">Tolibova Sevara Shaxruzovna</span> • Telegram: <span class="text-cyan-400 font-mono">@shxrzvnaa</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT MANTIQI -->
+  <script>
+    // 1. O'zbekistonning 14 ta viloyati kesimidagi parkovka narxlari
+    const REGIONS = [
+      { id: 'toshkent_sh', name: 'Toshkent shahri', rate: 10000, hub: 'Toshkent — Amir Temur & Magic City Hub' },
+      { id: 'toshkent_vil', name: 'Toshkent viloyati', rate: 6000, hub: 'Chirchiq & Nurafshon Smart Park' },
+      { id: 'samarqand', name: 'Samarqand viloyati', rate: 7000, hub: 'Samarqand — Registon & Silk Road Hub' },
+      { id: 'buxoro', name: 'Buxoro viloyati', rate: 6500, hub: 'Buxoro — Ark & Markaziy Turargoh' },
+      { id: 'andijon', name: 'Andijon viloyati', rate: 5500, hub: 'Andijon — Bobur Shohko‘chasi Hub' },
+      { id: 'fargona', name: 'Farg‘ona viloyati', rate: 5500, hub: 'Farg‘ona — Al-Farg‘oniy Smart Park' },
+      { id: 'namangan', name: 'Namangan viloyati', rate: 5500, hub: 'Namangan — Afsonalar Vodiysi Hub' },
+      { id: 'xorazm', name: 'Xorazm viloyati', rate: 6000, hub: 'Urganch & Xiva Ichan-Qal’a Park' },
+      { id: 'qashqadaryo', name: 'Qashqadaryo viloyati', rate: 5000, hub: 'Qarshi — Mustaqillik Smart Hub' },
+      { id: 'surxondaryo', name: 'Surxondaryo viloyati', rate: 5000, hub: 'Termiz — Markaziy Avtoturargoh' },
+      { id: 'navoiy', name: 'Navoiy viloyati', rate: 5500, hub: 'Navoiy — Yangi Shahar Smart Park' },
+      { id: 'jizzax', name: 'Jizzax viloyati', rate: 5000, hub: 'Jizzax — Sharof Rashidov Hub' },
+      { id: 'sirdaryo', name: 'Sirdaryo viloyati', rate: 4500, hub: 'Guliston — Markaziy Stansiya Park' },
+      { id: 'qoraqalpogiston', name: 'Qoraqalpog‘iston Resp.', rate: 5000, hub: 'Nukus — Savitskiy Smart Hub' },
+    ];
+
+    // 2. Holat (State)
+    let state = {
+      activePanel: 'client', // 'client' | 'admin'
+      selectedRegionId: 'toshkent_sh',
+      selectedFloor: 1, // 1 dan 5 gacha
+      userPlate: '01 A 123 BC',
+      subscriptionName: 'PLUS 100 soat',
+      subscriptionHours: 100,
+      lastBookingText: 'Hali bron qilinmagan',
+      selectedSlotToBook: null,
+
+      // Har bir viloyat va 1–5 qavatlar uchun joylar bazasi (16 ta joy har bir qavatda: 8 yuqori, 8 pastki)
+      floorsData: {},
+
+      // Admin paneli uchun tushumlar va tranzaksiyalar
+      totalRevenue: 18450000,
+      todayRevenue: 2890000,
+      subRevenue: 14200000,
+      bookingRevenue: 4250000,
+      activeSubscribers: 48,
+      regionRevenues: {
+        'Toshkent shahri': 8400000,
+        'Samarqand viloyati': 3150000,
+        'Buxoro viloyati': 2200000,
+        'Farg‘ona viloyati': 1850000,
+        'Andijon viloyati': 1550000,
+        'Boshqa viloyatlar': 1300000
+      },
+      transactions: [
+        { time: '12:58', plate: '01 Z 777 ZZ', region: 'Toshkent shahri', service: 'VIP MAX 300 soat obuna', amount: 1100000 },
+        { time: '12:41', plate: '30 A 512 BA', region: 'Samarqand viloyati', service: 'PRO 200 soat obuna', amount: 800000 },
+        { time: '12:25', plate: '80 M 304 AA', region: 'Buxoro viloyati', service: '2-qavat #B3 (3 soat bron)', amount: 19500 },
+        { time: '11:50', plate: '01 H 909 KA', region: 'Toshkent shahri', service: 'PLUS 100 soat obuna', amount: 450000 },
+        { time: '11:15', plate: '40 D 118 OA', region: 'Farg‘ona viloyati', service: '1-qavat #A5 (4 soat bron)', amount: 22000 },
+      ]
+    };
+
+    // Har bir viloyatning 1-5 qavatlari uchun boshlang'ich sensor holatini yaratish
+    function initFloorsData() {
+      REGIONS.forEach((reg, rIdx) => {
+        state.floorsData[reg.id] = {};
+        for (let f = 1; f <= 5; f++) {
+          const slots = [];
+          for (let i = 1; i <= 16; i++) {
+            const code = (i <= 8 ? 'A' : 'B') + (i <= 8 ? i : i - 8);
+            // Deterministik, lekin har xil bo'sh/band/bron joylar taqsimoti
+            const seed = (rIdx * 7 + f * 13 + i * 5) % 11;
+            let status = 'free'; // 'free' (yashil), 'occupied' (qizil), 'reserved' (ko'k)
+            if (seed === 1 || seed === 4 || seed === 7 || seed === 9) status = 'occupied';
+            else if (seed === 2 || seed === 8) status = 'reserved';
+            slots.push({ id: `${f}-${code}`, floor: f, code, status, plate: status !== 'free' ? '01 X 882 AA' : '' });
+          }
+          state.floorsData[reg.id][f] = slots;
+        }
+      });
+    }
+
+    // Pul formatlash (10,000 so'm)
+    function formatUZS(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' so‘m';
+    }
+
+    // Panel almashtirish (Mijoz / Admin)
+    function switchPanel(panel) {
+      state.activePanel = panel;
+      const clientPanel = document.getElementById('panel-client');
+      const adminPanel = document.getElementById('panel-admin');
+      const btnClient = document.getElementById('btn-tab-client');
+      const btnAdmin = document.getElementById('btn-tab-admin');
+
+      if (panel === 'client') {
+        clientPanel.classList.remove('hidden');
+        adminPanel.classList.add('hidden');
+        btnClient.className = 'flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-blue-600 text-white shadow-md shadow-blue-600/30';
+        btnAdmin.className = 'flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white';
+      } else {
+        clientPanel.classList.add('hidden');
+        adminPanel.classList.remove('hidden');
+        btnAdmin.className = 'flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-amber-500 text-navy-950 font-bold shadow-md shadow-amber-500/30';
+        btnClient.className = 'flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white';
+        renderAdminPanel();
+      }
+    }
+
+    // Viloyatlar ro'yxatini chizish
+    function renderRegions() {
+      const select = document.getElementById('region-select');
+      const pills = document.getElementById('region-pills-container');
+      select.innerHTML = '';
+      pills.innerHTML = '';
+
+      REGIONS.forEach(reg => {
+        const opt = document.createElement('option');
+        opt.value = reg.id;
+        opt.textContent = `${reg.name} — ${formatUZS(reg.rate)}/soat`;
+        if (reg.id === state.selectedRegionId) opt.selected = true;
+        select.appendChild(opt);
+
+        const isSelected = reg.id === state.selectedRegionId;
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.onclick = () => {
+          state.selectedRegionId = reg.id;
+          renderAllClient();
+        };
+        pill.className = `shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border transition-all ${
+          isSelected
+            ? 'bg-blue-600/25 border-cyan-400 text-cyan-200 font-bold'
+            : 'bg-navy-950/90 border-slate-800 text-slate-400 hover:border-slate-600 hover:text-slate-200'
+        }`;
+        pill.innerHTML = `${reg.name.replace(' viloyati', '')}: <span class="font-mono text-white">${(reg.rate / 1000).toFixed(1)}k</span>`;
+        pills.appendChild(pill);
+      });
+
+      const currentReg = REGIONS.find(r => r.id === state.selectedRegionId);
+      document.getElementById('selected-region-price').textContent = `${formatUZS(currentReg.rate)}/soat`;
+      document.getElementById('region-hub-name').textContent = currentReg.hub;
+    }
+
+    function handleRegionChange() {
+      state.selectedRegionId = document.getElementById('region-select').value;
+      renderAllClient();
+    }
+
+    // 1 dan 5 gacha qavatlar tugmalarini chizish
+    function renderFloorTabs() {
+      const container = document.getElementById('floor-tabs');
+      container.innerHTML = '';
+      const regionFloors = state.floorsData[state.selectedRegionId];
+
+      for (let f = 1; f <= 5; f++) {
+        const freeCount = regionFloors[f].filter(s => s.status === 'free').length;
+        const active = state.selectedFloor === f;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = () => {
+          state.selectedFloor = f;
+          renderFloorTabs();
+          renderParkingGrid();
+        };
+        btn.className = `px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${
+          active
+            ? 'bg-blue-600 border-cyan-300 text-white shadow-lg shadow-blue-600/30'
+            : 'bg-navy-950 border-slate-700 text-slate-300 hover:border-blue-500/50'
+        }`;
+        btn.innerHTML = `
+          <span>${f}-qavat</span>
+          <span class="px-1.5 py-0.2 rounded-md text-[10px] font-mono ${active ? 'bg-navy-950/60 text-emerald-300' : 'bg-emerald-500/15 text-emerald-400'}">
+            ${freeCount} bo‘sh
+          </span>
+        `;
+        container.appendChild(btn);
+      }
+    }
+
+    // Tanlangan qavatdagi parkovka kataklarini chizish (PDF 7-bet uslubida)
+    function renderParkingGrid() {
+      const topGrid = document.getElementById('parking-grid-top');
+      const bottomGrid = document.getElementById('parking-grid-bottom');
+      topGrid.innerHTML = '';
+      bottomGrid.innerHTML = '';
+
+      const slots = state.floorsData[state.selectedRegionId][state.selectedFloor];
+      let free = 0, occupied = 0, reserved = 0;
+
+      slots.forEach((slot, idx) => {
+        if (slot.status === 'free') free++;
+        else if (slot.status === 'occupied') occupied++;
+        else reserved++;
+
+        const card = document.createElement('button');
+        card.type = 'button';
+
+        let styleClass = '';
+        let statusLabel = '';
+        if (slot.status === 'free') {
+          styleClass = 'bg-emerald-500/20 border-emerald-400 hover:bg-emerald-500/35 hover:scale-[1.03] text-emerald-200 cursor-pointer shadow-sm shadow-emerald-500/20';
+          statusLabel = 'BO‘SH';
+          card.onclick = () => openBookingModal(slot);
+        } else if (slot.status === 'occupied') {
+          styleClass = 'bg-red-500/25 border-red-500/80 text-red-200 cursor-not-allowed opacity-90';
+          statusLabel = 'BAND';
+          card.onclick = () => showToast('Joy band', `${state.selectedFloor}-qavat, ${slot.code} joyda hozir avtomobil turibdi.`);
+        } else {
+          styleClass = 'bg-blue-500/25 border-blue-400 text-blue-200 cursor-not-allowed';
+          statusLabel = 'BRON';
+          card.onclick = () => showToast('Allaqachon bron qilingan', `${state.selectedFloor}-qavat, ${slot.code} joy band qilingan.`);
+        }
+
+        card.className = `rounded-xl border-2 p-2 sm:p-2.5 flex flex-col items-center justify-center transition-all min-h-[64px] sm:min-h-[74px] ${styleClass}`;
+        card.innerHTML = `
+          <span class="font-mono font-extrabold text-xs sm:text-sm text-white">${slot.code}</span>
+          <span class="text-[9px] sm:text-[10px] font-bold tracking-wider mt-0.5">${statusLabel}</span>
+          <span class="w-1.5 h-1.5 rounded-full mt-1 ${slot.status === 'free' ? 'bg-emerald-400' : slot.status === 'occupied' ? 'bg-red-400' : 'bg-blue-400'}"></span>
+        `;
+
+        if (idx < 8) topGrid.appendChild(card);
+        else bottomGrid.appendChild(card);
+      });
+
+      document.getElementById('floor-free-count').textContent = free;
+      document.getElementById('floor-occupied-count').textContent = occupied;
+      document.getElementById('floor-reserved-count').textContent = reserved;
+      document.getElementById('current-floor-label').textContent = `${state.selectedFloor}-qavat • A/B sektor (${free} ta bo‘sh joy)`;
+
+      updateGlobalHeroStats();
+      renderVip300LiveRadar();
+    }
+
+    // Hero bannerdagi umumiy 1-5 qavat statistikasi
+    function updateGlobalHeroStats() {
+      const regionFloors = state.floorsData[state.selectedRegionId];
+      let totalFree = 0, totalOcc = 0, totalRes = 0;
+      for (let f = 1; f <= 5; f++) {
+        regionFloors[f].forEach(s => {
+          if (s.status === 'free') totalFree++;
+          else if (s.status === 'occupied') totalOcc++;
+          else totalRes++;
+        });
+      }
+      document.getElementById('hero-free-count').textContent = totalFree;
+      document.getElementById('hero-occupied-count').textContent = totalOcc;
+      document.getElementById('hero-reserved-count').textContent = totalRes;
+    }
+
+    // 300 SOAT VIP OBUNA UCHUN: Qayerda bo'sh joy borligini aniq ko'rsatuvchi radar
+    function renderVip300LiveRadar() {
+      const box = document.getElementById('vip-300-live-spots');
+      const regionFloors = state.floorsData[state.selectedRegionId];
+      const currentReg = REGIONS.find(r => r.id === state.selectedRegionId);
+      box.innerHTML = '';
+
+      for (let f = 1; f <= 5; f++) {
+        const freeSlots = regionFloors[f].filter(s => s.status === 'free').map(s => s.code);
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-navy-900/90 px-2 py-1 rounded border border-slate-800';
+        row.innerHTML = `
+          <span class="font-bold text-slate-200">${f}-qavat:</span>
+          <span class="font-mono text-emerald-400 truncate max-w-[175px]" title="${freeSlots.join(', ')}">
+            ${freeSlots.length > 0 ? freeSlots.slice(0, 5).join(', ') + (freeSlots.length > 5 ? ` (+${freeSlots.length - 5})` : '') : 'Bo‘sh joy yo‘q'}
+          </span>
+        `;
+        box.appendChild(row);
+      }
+
+      const note = document.createElement('div');
+      note.className = 'text-[10px] text-cyan-300 pt-1';
+      note.textContent = `Hudud: ${currentReg.name} • Barcha bo‘sh kataklar faol`;
+      box.appendChild(note);
+    }
+
+    // Bron qilish modalini ochish
+    function openBookingModal(slot) {
+      state.selectedSlotToBook = slot;
+      const currentReg = REGIONS.find(r => r.id === state.selectedRegionId);
+      document.getElementById('modal-slot-title').textContent = `${currentReg.name} • ${slot.floor}-qavat, Joy #${slot.code}`;
+      document.getElementById('modal-plate-input').value = state.userPlate;
+      document.getElementById('modal-region-rate').textContent = `${formatUZS(currentReg.rate)}/soat`;
+      document.getElementById('modal-sub-balance').textContent = `${state.subscriptionHours} soat`;
+
+      const paySelect = document.getElementById('modal-payment-type');
+      paySelect.value = state.subscriptionHours > 0 ? 'balance' : 'cash';
+
+      updateBookingPricePreview();
+      const modal = document.getElementById('booking-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeBookingModal() {
+      const modal = document.getElementById('booking-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      state.selectedSlotToBook = null;
+    }
+
+    function updateBookingPricePreview() {
+      const hours = parseInt(document.getElementById('modal-hours-select').value, 10);
+      const payType = document.getElementById('modal-payment-type').value;
+      const currentReg = REGIONS.find(r => r.id === state.selectedRegionId);
+      const costEl = document.getElementById('modal-total-cost');
+
+      if (payType === 'balance') {
+        if (state.subscriptionHours >= hours) {
+          costEl.textContent = `0 so‘m (-${hours} soat obunadan)`;
+          costEl.className = 'text-emerald-400 font-mono';
+        } else {
+          costEl.textContent = `Obuna soati yetarli emas (${formatUZS(hours * currentReg.rate)})`;
+          costEl.className = 'text-amber-400 font-mono text-xs';
+        }
+      } else {
+        costEl.textContent = formatUZS(hours * currentReg.rate);
+        costEl.className = 'text-cyan-300 font-mono';
+      }
+    }
+
+    // Bronni tasdiqlash (Mijoz panelida ishlaydi, Admin tushumiga ham yoziladi)
+    function confirmBooking() {
+      if (!state.selectedSlotToBook) return;
+      const plateInput = document.getElementById('modal-plate-input').value.trim().toUpperCase();
+      if (!plateInput) {
+        showToast('Xatolik', 'Iltimos, avtomobil davlat raqamini kiriting!');
+        return;
+      }
+
+      const hours = parseInt(document.getElementById('modal-hours-select').value, 10);
+      let payType = document.getElementById('modal-payment-type').value;
+      const currentReg = REGIONS.find(r => r.id === state.selectedRegionId);
+      const totalAmount = hours * currentReg.rate;
+
+      if (payType === 'balance' && state.subscriptionHours < hours) {
+        payType = 'cash';
+      }
+
+      state.userPlate = plateInput;
+      document.getElementById('client-plate-display').textContent = plateInput;
+      document.getElementById('live-ocr-badge').textContent = `OCR: ${plateInput}`;
+
+      // Joy holatini 'reserved' (ko'k) ga o'zgartirish
+      state.selectedSlotToBook.status = 'reserved';
+      state.selectedSlotToBook.plate = plateInput;
+
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      if (payType === 'balance') {
+        state.subscriptionHours -= hours;
+        document.getElementById('client-sub-display').textContent = `${state.subscriptionName.split(' ')[0]} • ${state.subscriptionHours} soat`;
+        state.transactions.unshift({
+          time: timeStr,
+          plate: plateInput,
+          region: currentReg.name,
+          service: `${state.selectedSlotToBook.floor}-qavat #${state.selectedSlotToBook.code} (Obuna: -${hours}h)`,
+          amount: 0
+        });
+        showToast('Joy bron qilindi!', `${currentReg.name}, ${state.selectedSlotToBook.floor}-qavat #${state.selectedSlotToBook.code} joy obuna hisobidan band qilindi.`);
+      } else {
+        // Naqd/karta to'lovi Admin tushumiga qo'shiladi
+        state.totalRevenue += totalAmount;
+        state.todayRevenue += totalAmount;
+        state.bookingRevenue += totalAmount;
+        addRegionRevenue(currentReg.name, totalAmount);
+
+        state.transactions.unshift({
+          time: timeStr,
+          plate: plateInput,
+          region: currentReg.name,
+          service: `${state.selectedSlotToBook.floor}-qavat #${state.selectedSlotToBook.code} (${hours} soat bron)`,
+          amount: totalAmount
+        });
+        showToast('To‘lov va bron tasdiqlandi!', `${formatUZS(totalAmount)} to‘landi. Joy #${state.selectedSlotToBook.code} siz uchun band!`);
+      }
+
+      state.lastBookingText = `${currentReg.name.replace(' viloyati', '')}, ${state.selectedSlotToBook.floor}-qavat #${state.selectedSlotToBook.code}`;
+      document.getElementById('last-booking-info').textContent = state.lastBookingText;
+
+      closeBookingModal();
+      renderFloorTabs();
+      renderParkingGrid();
+    }
+
+    // Obuna sotib olish (100 PLUS, 200 PRO, 300 VIP)
+    function buySubscription(planName, hours, price) {
+      const currentReg = REGIONS.find(r => r.id === state.selectedRegionId);
+      state.subscriptionName = planName;
+      state.subscriptionHours += hours;
+
+      document.getElementById('client-sub-display').textContent = `${planName.split(' ')[0]} • ${state.subscriptionHours} soat`;
+      document.getElementById('pass-status-badge').textContent = 'Obuna: Faol';
+
+      // Admin tushumlariga qo'shish
+      state.totalRevenue += price;
+      state.todayRevenue += price;
+      state.subRevenue += price;
+      state.activeSubscribers += 1;
+      addRegionRevenue(currentReg.name, price);
+
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      state.transactions.unshift({
+        time: timeStr,
+        plate: state.userPlate,
+        region: currentReg.name,
+        service: `${planName} obuna paketi`,
+        amount: price
+      });
+
+      showToast(`${planName} faollashtirildi!`, `Balansingizga +${hours} soat qo‘shildi. Jami: ${state.subscriptionHours} soat.`);
+    }
+
+    function addRegionRevenue(regionName, amount) {
+      if (state.regionRevenues[regionName] !== undefined) {
+        state.regionRevenues[regionName] += amount;
+      } else {
+        state.regionRevenues['Boshqa viloyatlar'] += amount;
+      }
+    }
+
+    // ADMIN PANELINI CHIZISH (Bron qilish funksiyasi umuman yo'q!)
+    function renderAdminPanel() {
+      document.getElementById('admin-total-revenue').textContent = formatUZS(state.totalRevenue);
+      document.getElementById('admin-today-revenue').textContent = formatUZS(state.todayRevenue);
+      document.getElementById('admin-sub-revenue').textContent = formatUZS(state.subRevenue);
+      document.getElementById('admin-booking-revenue').textContent = formatUZS(state.bookingRevenue);
+      document.getElementById('admin-tx-count').textContent = state.transactions.length;
+      document.getElementById('admin-sub-count').textContent = state.activeSubscribers;
+
+      // Viloyatlar bo'yicha tushum barlari
+      const barsContainer = document.getElementById('admin-region-bars');
+      barsContainer.innerHTML = '';
+      const entries = Object.entries(state.regionRevenues).sort((a, b) => b[1] - a[1]);
+      const maxVal = entries[0][1] || 1;
+
+      entries.forEach(([regName, val]) => {
+        const pct = Math.round((val / maxVal) * 100);
+        const item = document.createElement('div');
+        item.innerHTML = `
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-200 font-medium">${regName}</span>
+            <span class="font-mono text-emerald-400 font-bold">${formatUZS(val)}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-navy-950 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-400" style="width: ${pct}%"></div>
+          </div>
+        `;
+        barsContainer.appendChild(item);
+      });
+
+      // 1-5 qavatlar bandlik holati (Faqat ko'rish)
+      const floorsContainer = document.getElementById('admin-floors-summary');
+      floorsContainer.innerHTML = '';
+      const regionFloors = state.floorsData[state.selectedRegionId];
+      const currentReg = REGIONS.find(r => r.id === state.selectedRegionId);
+
+      for (let f = 1; f <= 5; f++) {
+        const slots = regionFloors[f];
+        const free = slots.filter(s => s.status === 'free').length;
+        const occ = slots.filter(s => s.status === 'occupied').length;
+        const res = slots.filter(s => s.status === 'reserved').length;
+        const busyPct = Math.round(((occ + res) / slots.length) * 100);
+
+        const row = document.createElement('div');
+        row.className = 'rounded-xl bg-navy-950/90 border border-slate-800 p-2.5';
+        row.innerHTML = `
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-bold text-white">${f}-qavat <span class="text-slate-400 font-normal">(${currentReg.name})</span></span>
+            <div class="flex items-center gap-2 font-mono text-[11px]">
+              <span class="text-emerald-400">Bo‘sh: ${free}</span>
+              <span class="text-red-400">Band: ${occ}</span>
+              <span class="text-blue-400">Bron: ${res}</span>
+            </div>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
+            <div class="bg-red-500 h-full" style="width: ${(occ / 16) * 100}%"></div>
+            <div class="bg-blue-500 h-full" style="width: ${(res / 16) * 100}%"></div>
+            <div class="bg-emerald-500 h-full" style="width: ${(free / 16) * 100}%"></div>
+          </div>
+        `;
+        floorsContainer.appendChild(row);
+      }
+
+      // Tranzaksiyalar jadvali
+      const tbody = document.getElementById('admin-transactions-table');
+      tbody.innerHTML = '';
+      state.transactions.forEach(tx => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-navy-800/50 transition-colors';
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-mono text-slate-400">${tx.time}</td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-600 font-mono font-bold text-white text-xs">${tx.plate}</span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-300">${tx.region}</td>
+          <td class="py-2.5 px-3 text-cyan-300">${tx.service}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-bold ${tx.amount > 0 ? 'text-emerald-400' : 'text-amber-300'}">
+            ${tx.amount > 0 ? '+' + formatUZS(tx.amount) : 'Obuna balansi'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function scrollToSubscriptions() {
+      document.getElementById('subscriptions-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    let toastTimer = null;
+    function showToast(title, msg) {
+      const box = document.getElementById('toast-box');
+      document.getElementById('toast-title').textContent = title;
+      document.getElementById('toast-msg').textContent = msg;
+      box.classList.remove('translate-y-24', 'opacity-0');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        box.classList.add('translate-y-24', 'opacity-0');
+      }, 3600);
+    }
+
+    function renderAllClient() {
+      renderRegions();
+      renderFloorTabs();
+      renderParkingGrid();
+    }
+
+    // Sahifa yuklanganda ishga tushirish
+    window.onload = function () {
+      initFloorsData();
+      renderAllClient();
+    };
+  </script>
+</body>
+</html>

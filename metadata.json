@@ -1,0 +1,6 @@
+{
+  "name": "Seva’s ParkWay",
+  "description": "Seva’s ParkWay — Sun’iy intellekt va IoT sensorlar asosidagi aqlli avtoturargoh boshqaruv tizimi (14 viloyat, 1–5 qavatlar, obunalar va Admin paneli).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
